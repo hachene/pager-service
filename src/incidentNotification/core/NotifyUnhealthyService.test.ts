@@ -1,4 +1,5 @@
 import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
+import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
@@ -11,6 +12,7 @@ describe('NotifyUnhealthyService', () => {
   let alert: Alert
   let markMonitoredServiceAsUnhealthyMock: jest.Mock<any, any>
   let getEscalationPolicyByServiceIdMock: jest.Mock<any, any>
+  let sendAlertViaEmailMock: jest.Mock<any, any>
 
   beforeEach(() => {
     markMonitoredServiceAsUnhealthyMock = jest.fn()
@@ -35,7 +37,16 @@ describe('NotifyUnhealthyService', () => {
       getEscalationPolicyByServiceId: getEscalationPolicyByServiceIdMock,
     }
 
-    subject = new NotifyUnhealthyService(persistanceAdapterMock, escalationPolicyServiceAdapterMock)
+    sendAlertViaEmailMock = jest.fn()
+    const mailServiceAdapterMock: MailServiceInterface = {
+      sendAlert: sendAlertViaEmailMock,
+    }
+
+    subject = new NotifyUnhealthyService(
+      persistanceAdapterMock,
+      escalationPolicyServiceAdapterMock,
+      mailServiceAdapterMock,
+    )
   })
 
   afterEach(() => jest.clearAllMocks())
@@ -58,8 +69,11 @@ describe('NotifyUnhealthyService', () => {
       it('the Pager notifies all targets of the first level of the escalation policy', () => {
         subject.perform(alert)
 
-        expect(getEscalationPolicyByServiceIdMock).toHaveBeenCalledTimes(1)
-        expect(getEscalationPolicyByServiceIdMock).toHaveBeenCalledWith(alert.monitoredServiceId)
+        expect(sendAlertViaEmailMock).toHaveBeenCalledTimes(2)
+        expect(sendAlertViaEmailMock.mock.calls).toEqual([
+          ['raquel@aircall.com', { monitoredServiceId: 1 }],
+          ['juan@aircall.com', { monitoredServiceId: 1 }],
+        ])
       })
     })
   })
