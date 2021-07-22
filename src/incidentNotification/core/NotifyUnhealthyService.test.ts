@@ -137,6 +137,12 @@ describe('NotifyUnhealthyService', () => {
         expect(sendAlertViaEmailMock).not.toHaveBeenCalled()
         // TODO: Ensure we are not calling the SmsService either
       })
+
+      it('the Pager does not set 15-minutes acknowledgement delay', () => {
+        subject.perform(alert)
+
+        expect(setTimerForAlertMock).not.toHaveBeenCalled()
+      })
     })
   })
 })
