@@ -2,7 +2,6 @@ import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPo
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
-import { MonitoredService } from './models/MonitoredService'
 import { EmailTarget } from './models/Target/EmailTarget'
 import { SmsTarget } from './models/Target/SmsTarget'
 import { NotifyUnhealthyService } from './NotifyUnhealthyService'
@@ -11,7 +10,7 @@ describe('NotifyUnhealthyService', () => {
   let subject: NotifyUnhealthyService
   let alert: Alert
   let markMonitoredServiceAsUnhealthyMock: jest.Mock<any, any>
-  let getEscalationPolicyByServiceIdMock: (id: MonitoredService['id']) => EscalationPolicy
+  let getEscalationPolicyByServiceIdMock: jest.Mock<any, any>
 
   beforeEach(() => {
     markMonitoredServiceAsUnhealthyMock = jest.fn()
