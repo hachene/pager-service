@@ -10,4 +10,5 @@ export class MonitoredService {
 
 export enum MonitoredServiceStatus {
   healthy = 'healthy',
+  unhealthy = 'unhealthy',
 }

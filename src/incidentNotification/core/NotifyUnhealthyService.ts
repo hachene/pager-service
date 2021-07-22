@@ -3,9 +3,11 @@ import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
 import { Alert } from './models/Alert'
+import { MonitoredServiceStatus } from './models/MonitoredService'
 import { EmailTarget } from './models/Target/EmailTarget'
 
 const MINUTES_FOR_ALERT_TIMER_TIMEOUT = 15
+
 export class NotifyUnhealthyService {
   private persistance: PersistanceInterface
   private escalationPolicyService: EscalationPolicyServiceInterface
@@ -26,6 +28,9 @@ export class NotifyUnhealthyService {
 
   public perform(alert: NotifyUnhealthyServiceParams): void {
     const { monitoredServiceId } = alert
+
+    const monitoredService = this.persistance.getMonitoredServiceById(monitoredServiceId)
+    if (monitoredService.status === MonitoredServiceStatus.unhealthy) return
 
     this.persistance.markMonitoredServiceAsUnhealthy(monitoredServiceId)
 
