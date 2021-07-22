@@ -2,14 +2,13 @@ import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPo
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
-import { MonitoredService, MonitoredServiceStatus } from './models/MonitoredService'
+import { MonitoredService } from './models/MonitoredService'
 import { EmailTarget } from './models/Target/EmailTarget'
 import { SmsTarget } from './models/Target/SmsTarget'
 import { NotifyUnhealthyService } from './NotifyUnhealthyService'
 
 describe('NotifyUnhealthyService', () => {
   let subject: NotifyUnhealthyService
-  let monitoredService: MonitoredService
   let alert: Alert
   let markMonitoredServiceAsUnhealthyMock: jest.Mock<any, any>
   let getEscalationPolicyByServiceIdMock: (id: MonitoredService['id']) => EscalationPolicy
@@ -28,14 +27,11 @@ describe('NotifyUnhealthyService', () => {
       new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' }),
       new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' }),
     ]
-
     const returnedEscalationPolicy = new EscalationPolicy({
       monitoredServiceId: 1,
       levels: [targetsFirstLevel, targetsLastLevel],
     })
-
     getEscalationPolicyByServiceIdMock = jest.fn(() => returnedEscalationPolicy)
-
     const escalationPolicyServiceAdapterMock: EscalationPolicyServiceInterface = {
       getEscalationPolicyByServiceId: getEscalationPolicyByServiceIdMock,
     }
@@ -48,11 +44,6 @@ describe('NotifyUnhealthyService', () => {
   describe('given a Monitored Service in an Healthy State', () => {
     describe('when the Pager receives an Alert related to this Monitored Service', () => {
       beforeAll(() => {
-        monitoredService = new MonitoredService({
-          id: 1,
-          status: MonitoredServiceStatus.healthy,
-        })
-
         alert = new Alert({
           monitoredServiceId: 1,
         })
