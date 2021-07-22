@@ -1,6 +1,7 @@
 import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
 import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
+import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
 import { EmailTarget } from './models/Target/EmailTarget'
@@ -13,6 +14,7 @@ describe('NotifyUnhealthyService', () => {
   let markMonitoredServiceAsUnhealthyMock: jest.Mock<any, any>
   let getEscalationPolicyByServiceIdMock: jest.Mock<any, any>
   let sendAlertViaEmailMock: jest.Mock<any, any>
+  let setTimerForAlertMock: jest.Mock<any, any>
 
   beforeEach(() => {
     markMonitoredServiceAsUnhealthyMock = jest.fn()
@@ -42,10 +44,16 @@ describe('NotifyUnhealthyService', () => {
       sendAlert: sendAlertViaEmailMock,
     }
 
+    setTimerForAlertMock = jest.fn()
+    const timerServiceAdapterMock: TimerServiceInterface = {
+      setTimerForAlert: setTimerForAlertMock,
+    }
+
     subject = new NotifyUnhealthyService(
       persistanceAdapterMock,
       escalationPolicyServiceAdapterMock,
       mailServiceAdapterMock,
+      timerServiceAdapterMock,
     )
   })
 
@@ -74,6 +82,13 @@ describe('NotifyUnhealthyService', () => {
           ['raquel@aircall.com', { monitoredServiceId: 1 }],
           ['juan@aircall.com', { monitoredServiceId: 1 }],
         ])
+      })
+
+      it('sets a 15-minutes acknowledgement delay', () => {
+        subject.perform(alert)
+
+        expect(setTimerForAlertMock).toHaveBeenCalledTimes(1)
+        expect(setTimerForAlertMock).toHaveBeenCalledWith(15, { monitoredServiceId: 1 })
       })
     })
   })
