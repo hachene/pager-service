@@ -29,6 +29,7 @@ describe('NotifyUnhealthyService', () => {
       const persistanceAdapterMock: PersistanceInterface = {
         markMonitoredServiceAsUnhealthy: markMonitoredServiceAsUnhealthyMock,
         getMonitoredServiceById: getMonitoredServiceByIdMock,
+        getAlertByMonitoredServiceId: jest.fn(),
       }
 
       const targetsFirstLevel = [
@@ -107,6 +108,7 @@ describe('NotifyUnhealthyService', () => {
         const persistanceAdapterMock: PersistanceInterface = {
           markMonitoredServiceAsUnhealthy: jest.fn(),
           getMonitoredServiceById: getMonitoredServiceByIdMock,
+          getAlertByMonitoredServiceId: jest.fn(),
         }
 
         const escalationPolicyServiceAdapterMock: EscalationPolicyServiceInterface = {
