@@ -1,4 +1,9 @@
-import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
+import {
+  buildEscalationPolicyServiceAdapterMock,
+  buildPersistanceInterfaceAdapterMock,
+  buildSmsServiceAdapterMock,
+  buildTimerServiceAdapterMock,
+} from '../../testUtils/mocks'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
@@ -11,10 +16,9 @@ import { NotifyMissedAlert } from './NotifyMissedAlert'
 describe('NotifyMissedAlert', () => {
   let subject: NotifyMissedAlert
 
-  let getEscalationPolicyByServiceIdMock: jest.Mock<any, any>
-  let sendAlertViaSmsMock: jest.Mock<any, any>
-  let getAlertByMonitoredServiceIdMock: jest.Mock<any, any>
-  let setTimerForAlertMock: jest.Mock<any, any>
+  let smsServiceAdapterMock: SmsServiceInterface
+  let persistanceServiceAdapterMock: PersistanceInterface
+  let timerServiceAdapterMock: TimerServiceInterface
 
   describe('given a Monitored Service in an Unhealthy State', () => {
     beforeEach(() => {
@@ -30,30 +34,23 @@ describe('NotifyMissedAlert', () => {
         monitoredServiceId: 1,
         levels: [targetsFirstLevel, targetsLastLevel],
       })
-      getEscalationPolicyByServiceIdMock = jest.fn(() => returnedEscalationPolicy)
-      const escalationPolicyServiceAdapterMock: EscalationPolicyServiceInterface = {
-        getEscalationPolicyByServiceId: getEscalationPolicyByServiceIdMock,
-      }
 
-      sendAlertViaSmsMock = jest.fn()
-      const smsServiceAdapterMock: SmsServiceInterface = {
-        sendAlert: sendAlertViaSmsMock,
-      }
+      const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
+        getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
+      })
+
+      smsServiceAdapterMock = buildSmsServiceAdapterMock()
 
       const returnedAlert = new Alert({
         monitoredServiceId: 1,
         areLastLevelTargetsNotified: false,
         isAcknowledge: false,
       })
-      getAlertByMonitoredServiceIdMock = jest.fn(() => returnedAlert)
-      const persistanceServiceAdapterMock: PersistanceInterface = {
-        getAlertByMonitoredServiceId: getAlertByMonitoredServiceIdMock,
-        getMonitoredServiceById: jest.fn(),
-        markMonitoredServiceAsUnhealthy: jest.fn(),
-      }
+      persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
+        getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
+      })
 
-      setTimerForAlertMock = jest.fn()
-      const timerServiceAdapterMock: TimerServiceInterface = { setTimerForAlert: setTimerForAlertMock }
+      timerServiceAdapterMock = buildTimerServiceAdapterMock()
 
       subject = new NotifyMissedAlert(
         escalationPolicyServiceAdapterMock,
@@ -67,13 +64,13 @@ describe('NotifyMissedAlert', () => {
         it('the Pager notifies all targets of the next level of the escalation policy when receive a timeout', () => {
           subject.perform({ monitoredServiceId: 1 })
 
-          expect(sendAlertViaSmsMock).toHaveBeenCalledTimes(2)
+          expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(2)
         })
         it('the Pager sets a 15-minutes acknowledgement delay', () => {
           subject.perform({ monitoredServiceId: 1 })
 
-          expect(setTimerForAlertMock).toHaveBeenCalledTimes(1)
-          expect(setTimerForAlertMock).toHaveBeenCalledWith(15, {
+          expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledTimes(1)
+          expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledWith(15, {
             areLastLevelTargetsNotified: false,
             isAcknowledge: false,
             monitoredServiceId: 1,

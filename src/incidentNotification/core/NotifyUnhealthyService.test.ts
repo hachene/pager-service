@@ -1,4 +1,9 @@
-import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
+import {
+  buildEscalationPolicyServiceAdapterMock,
+  buildMailServiceAdapterMock,
+  buildPersistanceInterfaceAdapterMock,
+  buildTimerServiceAdapterMock,
+} from '../../testUtils/mocks'
 import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
@@ -13,24 +18,18 @@ describe('NotifyUnhealthyService', () => {
   let subject: NotifyUnhealthyService
   let alert: Alert
 
-  let markMonitoredServiceAsUnhealthyMock: jest.Mock<any, any>
-  let getEscalationPolicyByServiceIdMock: jest.Mock<any, any>
-  let sendAlertViaEmailMock: jest.Mock<any, any>
-  let setTimerForAlertMock: jest.Mock<any, any>
-  let getMonitoredServiceByIdMock: jest.Mock<any, any>
+  let persistanceAdapterMock: PersistanceInterface
+  let mailServiceAdapterMock: MailServiceInterface
+  let timerServiceAdapterMock: TimerServiceInterface
 
   afterEach(() => jest.clearAllMocks())
 
   describe('given a Monitored Service in a Healthy State', () => {
     beforeEach(() => {
       const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.healthy })
-      markMonitoredServiceAsUnhealthyMock = jest.fn()
-      getMonitoredServiceByIdMock = jest.fn(() => returnedMonitoredService)
-      const persistanceAdapterMock: PersistanceInterface = {
-        markMonitoredServiceAsUnhealthy: markMonitoredServiceAsUnhealthyMock,
-        getMonitoredServiceById: getMonitoredServiceByIdMock,
-        getAlertByMonitoredServiceId: jest.fn(),
-      }
+      persistanceAdapterMock = buildPersistanceInterfaceAdapterMock({
+        getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
+      })
 
       const targetsFirstLevel = [
         new EmailTarget({ emailAddress: 'raquel@aircall.com' }),
@@ -44,20 +43,12 @@ describe('NotifyUnhealthyService', () => {
         monitoredServiceId: 1,
         levels: [targetsFirstLevel, targetsLastLevel],
       })
-      getEscalationPolicyByServiceIdMock = jest.fn(() => returnedEscalationPolicy)
-      const escalationPolicyServiceAdapterMock: EscalationPolicyServiceInterface = {
-        getEscalationPolicyByServiceId: getEscalationPolicyByServiceIdMock,
-      }
+      const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
+        getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
+      })
 
-      sendAlertViaEmailMock = jest.fn()
-      const mailServiceAdapterMock: MailServiceInterface = {
-        sendAlert: sendAlertViaEmailMock,
-      }
-
-      setTimerForAlertMock = jest.fn()
-      const timerServiceAdapterMock: TimerServiceInterface = {
-        setTimerForAlert: setTimerForAlertMock,
-      }
+      mailServiceAdapterMock = buildMailServiceAdapterMock()
+      timerServiceAdapterMock = buildTimerServiceAdapterMock()
 
       subject = new NotifyUnhealthyService(
         persistanceAdapterMock,
@@ -77,15 +68,15 @@ describe('NotifyUnhealthyService', () => {
       it('the Monitored Service becomes unhealthy', () => {
         subject.perform(alert)
 
-        expect(markMonitoredServiceAsUnhealthyMock).toHaveBeenCalledTimes(1)
-        expect(markMonitoredServiceAsUnhealthyMock).toHaveBeenCalledWith(alert.monitoredServiceId)
+        expect(persistanceAdapterMock.markMonitoredServiceAsUnhealthy).toHaveBeenCalledTimes(1)
+        expect(persistanceAdapterMock.markMonitoredServiceAsUnhealthy).toHaveBeenCalledWith(alert.monitoredServiceId)
       })
 
       it('the Pager notifies all targets of the first level of the escalation policy', () => {
         subject.perform(alert)
 
-        expect(sendAlertViaEmailMock).toHaveBeenCalledTimes(2)
-        expect(sendAlertViaEmailMock.mock.calls).toEqual([
+        expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(2)
+        expect(mailServiceAdapterMock.sendAlert['mock'].calls).toEqual([
           ['raquel@aircall.com', { monitoredServiceId: 1 }],
           ['juan@aircall.com', { monitoredServiceId: 1 }],
         ])
@@ -94,8 +85,8 @@ describe('NotifyUnhealthyService', () => {
       it('sets a 15-minutes acknowledgement delay', () => {
         subject.perform(alert)
 
-        expect(setTimerForAlertMock).toHaveBeenCalledTimes(1)
-        expect(setTimerForAlertMock).toHaveBeenCalledWith(15, { monitoredServiceId: 1 })
+        expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledTimes(1)
+        expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledWith(15, { monitoredServiceId: 1 })
       })
     })
   })
@@ -104,30 +95,16 @@ describe('NotifyUnhealthyService', () => {
     describe('when the Pager receives an Alert related to this Monitored Service', () => {
       beforeEach(() => {
         const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.unhealthy })
-        getMonitoredServiceByIdMock = jest.fn(() => returnedMonitoredService)
-        const persistanceAdapterMock: PersistanceInterface = {
-          markMonitoredServiceAsUnhealthy: jest.fn(),
-          getMonitoredServiceById: getMonitoredServiceByIdMock,
-          getAlertByMonitoredServiceId: jest.fn(),
-        }
+        const persistanceAdapterMock = buildPersistanceInterfaceAdapterMock({
+          getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
+        })
 
-        const escalationPolicyServiceAdapterMock: EscalationPolicyServiceInterface = {
-          getEscalationPolicyByServiceId: jest.fn(),
-        }
-
-        sendAlertViaEmailMock = jest.fn()
-        const mailServiceAdapterMock: MailServiceInterface = {
-          sendAlert: sendAlertViaEmailMock,
-        }
-
-        setTimerForAlertMock = jest.fn()
-        const timerServiceAdapterMock: TimerServiceInterface = {
-          setTimerForAlert: setTimerForAlertMock,
-        }
+        mailServiceAdapterMock = buildMailServiceAdapterMock()
+        timerServiceAdapterMock = buildTimerServiceAdapterMock()
 
         subject = new NotifyUnhealthyService(
           persistanceAdapterMock,
-          escalationPolicyServiceAdapterMock,
+          buildEscalationPolicyServiceAdapterMock(),
           mailServiceAdapterMock,
           timerServiceAdapterMock,
         )
@@ -136,14 +113,14 @@ describe('NotifyUnhealthyService', () => {
       it('the Pager does not notify any Target', () => {
         subject.perform(alert)
 
-        expect(sendAlertViaEmailMock).not.toHaveBeenCalled()
+        expect(mailServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
         // TODO: Ensure we are not calling the SmsService either
       })
 
       it('the Pager does not set 15-minutes acknowledgement delay', () => {
         subject.perform(alert)
 
-        expect(setTimerForAlertMock).not.toHaveBeenCalled()
+        expect(timerServiceAdapterMock.setTimerForAlert).not.toHaveBeenCalled()
       })
     })
   })
