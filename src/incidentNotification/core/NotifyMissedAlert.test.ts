@@ -1,6 +1,7 @@
 import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
+import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
 import { EmailTarget } from './models/Target/EmailTarget'
@@ -13,6 +14,7 @@ describe('NotifyMissedAlert', () => {
   let getEscalationPolicyByServiceIdMock: jest.Mock<any, any>
   let sendAlertViaSmsMock: jest.Mock<any, any>
   let getAlertByMonitoredServiceIdMock: jest.Mock<any, any>
+  let setTimerForAlertMock: jest.Mock<any, any>
 
   describe('given a Monitored Service in an Unhealthy State', () => {
     beforeEach(() => {
@@ -50,10 +52,14 @@ describe('NotifyMissedAlert', () => {
         markMonitoredServiceAsUnhealthy: jest.fn(),
       }
 
+      setTimerForAlertMock = jest.fn()
+      const timerServiceAdapterMock: TimerServiceInterface = { setTimerForAlert: setTimerForAlertMock }
+
       subject = new NotifyMissedAlert(
         escalationPolicyServiceAdapterMock,
         smsServiceAdapterMock,
         persistanceServiceAdapterMock,
+        timerServiceAdapterMock,
       )
     })
     describe('and the corresponding Alert is not Acknowledged', () => {
@@ -63,7 +69,16 @@ describe('NotifyMissedAlert', () => {
 
           expect(sendAlertViaSmsMock).toHaveBeenCalledTimes(2)
         })
-        it.todo('the Pager sets a 15-minutes acknowledgement delay')
+        it('the Pager sets a 15-minutes acknowledgement delay', () => {
+          subject.perform({ monitoredServiceId: 1 })
+
+          expect(setTimerForAlertMock).toHaveBeenCalledTimes(1)
+          expect(setTimerForAlertMock).toHaveBeenCalledWith(15, {
+            areLastLevelTargetsNotified: false,
+            isAcknowledge: false,
+            monitoredServiceId: 1,
+          })
+        })
       })
     })
   })
