@@ -25,7 +25,7 @@ export class ReceiveAcknowledgementTimeout {
 
   public perform({ monitoredServiceId }: ReceiveAcknowledgementTimeoutParams): void {
     const alert = this.persistance.getAlertByMonitoredServiceId(monitoredServiceId)
-    if (alert.isAcknowledge || alert.areLastLevelTargetsNotified) return
+    if (alert.isAcknowledged || alert.areLastLevelTargetsNotified) return
 
     const escalationPolicy = this.escalationPolicyService.getEscalationPolicyByServiceId(alert.monitoredServiceId)
     const lastLevelTargets = escalationPolicy.levels[1] as SmsTarget[]

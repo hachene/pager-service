@@ -49,7 +49,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         const returnedAlert = new Alert({
           monitoredServiceId: 1,
           areLastLevelTargetsNotified: false,
-          isAcknowledge: false,
+          isAcknowledged: false,
         })
         persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
@@ -104,7 +104,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         const returnedAlert = new Alert({
           monitoredServiceId: 1,
           areLastLevelTargetsNotified: false,
-          isAcknowledge: true,
+          isAcknowledged: true,
         })
         persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
