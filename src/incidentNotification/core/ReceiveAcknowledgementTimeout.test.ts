@@ -9,6 +9,7 @@ import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
+import { AcknowledgementTimeout } from './models/AcknowledgementTimeout'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
 import { MonitoredService, MonitoredServiceStatus } from './models/MonitoredService'
@@ -18,6 +19,9 @@ import { ReceiveAcknowledgementTimeout } from './ReceiveAcknowledgementTimeout'
 
 describe('ReceiveAcknowledgementTimeout', () => {
   let subject: ReceiveAcknowledgementTimeout
+
+  const monitoredServiceId = 1
+  const acknowledgementTimeout = new AcknowledgementTimeout({ monitoredServiceId })
 
   let smsServiceAdapterMock: SmsServiceInterface
   let mailServiceAdapterMock: MailServiceInterface
@@ -36,7 +40,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
       ]
       const returnedEscalationPolicy = new EscalationPolicy({
-        monitoredServiceId: 1,
+        monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
         levels: [targetsFirstLevel, targetsLastLevel],
       })
 
@@ -45,12 +49,15 @@ describe('ReceiveAcknowledgementTimeout', () => {
       })
 
       const returnedAlert = new Alert({
-        monitoredServiceId: 1,
+        monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
         areLastLevelTargetsNotified: false,
         isAcknowledged: false,
       })
 
-      const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.healthy })
+      const returnedMonitoredService = new MonitoredService({
+        id: monitoredServiceId,
+        status: MonitoredServiceStatus.healthy,
+      })
       persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
         getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
         getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
@@ -66,14 +73,14 @@ describe('ReceiveAcknowledgementTimeout', () => {
     })
 
     it('the Pager does not notify any Target', () => {
-      subject.perform({ monitoredServiceId: 1 })
+      subject.perform(acknowledgementTimeout)
 
       expect(smsServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
       expect(mailServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
     })
 
     it('the Pager does not set any acknowledgement delay', () => {
-      subject.perform({ monitoredServiceId: 1 })
+      subject.perform(acknowledgementTimeout)
 
       expect(timerServiceAdapterMock.setTimerForAlert).not.toHaveBeenCalled()
     })
@@ -94,7 +101,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
           new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
         ]
         const returnedEscalationPolicy = new EscalationPolicy({
-          monitoredServiceId: 1,
+          monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           levels: [targetsFirstLevel, targetsLastLevel],
         })
 
@@ -103,11 +110,14 @@ describe('ReceiveAcknowledgementTimeout', () => {
         })
 
         const returnedAlert = new Alert({
-          monitoredServiceId: 1,
+          monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           areLastLevelTargetsNotified: false,
           isAcknowledged: false,
         })
-        const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.unhealthy })
+        const returnedMonitoredService = new MonitoredService({
+          id: monitoredServiceId,
+          status: MonitoredServiceStatus.unhealthy,
+        })
         persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
           getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
@@ -124,18 +134,18 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
       describe('and the last level has not been notified', () => {
         it('the Pager notifies all targets of the next level of the escalation policy when receive a timeout', () => {
-          subject.perform({ monitoredServiceId: 1 })
+          subject.perform(acknowledgementTimeout)
 
           expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(2)
         })
         it('the Pager sets a 15-minutes acknowledgement delay', () => {
-          subject.perform({ monitoredServiceId: 1 })
+          subject.perform(acknowledgementTimeout)
 
           expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledTimes(1)
           expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledWith(15, {
             areLastLevelTargetsNotified: false,
             isAcknowledged: false,
-            monitoredServiceId: 1,
+            monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           })
         })
       })
@@ -154,7 +164,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         ]
 
         const returnedEscalationPolicy = new EscalationPolicy({
-          monitoredServiceId: 1,
+          monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           levels: [targetsFirstLevel, targetsLastLevel],
         })
 
@@ -163,7 +173,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         })
 
         const returnedAlert = new Alert({
-          monitoredServiceId: 1,
+          monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           areLastLevelTargetsNotified: false,
           isAcknowledged: true,
         })
@@ -181,15 +191,16 @@ describe('ReceiveAcknowledgementTimeout', () => {
           timerServiceAdapterMock,
         )
       })
+
       it('the Pager does not notify any Target', () => {
-        subject.perform({ monitoredServiceId: 1 })
+        subject.perform(acknowledgementTimeout)
 
         expect(smsServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
         expect(mailServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
       })
 
       it('the Pager does not set any acknowledgement delay', () => {
-        subject.perform({ monitoredServiceId: 1 })
+        subject.perform(acknowledgementTimeout)
 
         expect(timerServiceAdapterMock.setTimerForAlert).not.toHaveBeenCalled()
       })
