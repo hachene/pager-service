@@ -1,9 +1,9 @@
 import { MonitoredService } from './MonitoredService'
 
-export class AcknowledgeTimeout {
+export class AcknowledgementTimeout {
   public monitoredServiceId: MonitoredService['id']
 
-  constructor({ monitoredServiceId }: Partial<AcknowledgeTimeout>) {
+  constructor({ monitoredServiceId }: Partial<AcknowledgementTimeout>) {
     this.monitoredServiceId = monitoredServiceId
   }
 }
