@@ -2,10 +2,10 @@ import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPo
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
-import { AcknowledgeTimeout } from './models/AcknowledgeTimeout'
+import { AcknowledgementTimeout } from './models/AcknowledgementTimeout'
 import { SmsTarget } from './models/Target/SmsTarget'
 
-export class NotifyMissedAlert {
+export class ReceiveAcknowledgementTimeout {
   private escalationPolicyService: EscalationPolicyServiceInterface
   private smsService: SmsServiceInterface
   private persistance: PersistanceInterface
@@ -23,7 +23,7 @@ export class NotifyMissedAlert {
     this.timerService = timerService
   }
 
-  public perform({ monitoredServiceId }: NotifyMissedAlertParams): void {
+  public perform({ monitoredServiceId }: ReceiveAcknowledgementTimeoutParams): void {
     const alert = this.persistance.getAlertByMonitoredServiceId(monitoredServiceId)
     if (alert.isAcknowledge || alert.areLastLevelTargetsNotified) return
 
@@ -37,4 +37,4 @@ export class NotifyMissedAlert {
   }
 }
 
-type NotifyMissedAlertParams = AcknowledgeTimeout
+type ReceiveAcknowledgementTimeoutParams = AcknowledgementTimeout

@@ -11,10 +11,10 @@ import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
 import { EmailTarget } from './models/Target/EmailTarget'
 import { SmsTarget } from './models/Target/SmsTarget'
-import { NotifyMissedAlert } from './NotifyMissedAlert'
+import { ReceiveAcknowledgementTimeout } from './ReceiveAcknowledgementTimeout'
 
-describe('NotifyMissedAlert', () => {
-  let subject: NotifyMissedAlert
+describe('ReceiveAcknowledgementTimeout', () => {
+  let subject: ReceiveAcknowledgementTimeout
 
   let smsServiceAdapterMock: SmsServiceInterface
   let persistanceServiceAdapterMock: PersistanceInterface
@@ -52,7 +52,7 @@ describe('NotifyMissedAlert', () => {
 
       timerServiceAdapterMock = buildTimerServiceAdapterMock()
 
-      subject = new NotifyMissedAlert(
+      subject = new ReceiveAcknowledgementTimeout(
         escalationPolicyServiceAdapterMock,
         smsServiceAdapterMock,
         persistanceServiceAdapterMock,
