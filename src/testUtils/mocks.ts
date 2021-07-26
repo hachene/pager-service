@@ -26,6 +26,7 @@ export const buildPersistanceInterfaceAdapterMock = (
   getAlertByMonitoredServiceId: overwriteOptions?.getAlertByMonitoredServiceId || jest.fn(),
   getMonitoredServiceById: overwriteOptions?.getMonitoredServiceById || jest.fn(),
   markMonitoredServiceAsUnhealthy: overwriteOptions?.markMonitoredServiceAsUnhealthy || jest.fn(),
+  markMonitoredServiceAsHealthy: overwriteOptions?.markMonitoredServiceAsHealthy || jest.fn(),
 })
 
 export const buildTimerServiceAdapterMock = (
