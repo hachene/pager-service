@@ -11,6 +11,7 @@ import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
+import { MonitoredService, MonitoredServiceStatus } from './models/MonitoredService'
 import { EmailTarget } from './models/Target/EmailTarget'
 import { SmsTarget } from './models/Target/SmsTarget'
 import { ReceiveAcknowledgementTimeout } from './ReceiveAcknowledgementTimeout'
@@ -22,6 +23,58 @@ describe('ReceiveAcknowledgementTimeout', () => {
   let mailServiceAdapterMock: MailServiceInterface
   let persistanceServiceAdapterMock: PersistanceInterface
   let timerServiceAdapterMock: TimerServiceInterface
+
+  describe('given a Monitored Service in a Healthy State', () => {
+    beforeEach(() => {
+      const targetsFirstLevel = [new EmailTarget({ emailAddress: 'raquel@aircall.com' })]
+      const targetsLastLevel = [new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' })]
+      const returnedEscalationPolicy = new EscalationPolicy({
+        monitoredServiceId: 1,
+        levels: [targetsFirstLevel, targetsLastLevel],
+      })
+
+      const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
+        getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
+      })
+
+      smsServiceAdapterMock = buildSmsServiceAdapterMock()
+      mailServiceAdapterMock = buildMailServiceAdapterMock()
+
+      const returnedAlert = new Alert({
+        monitoredServiceId: 1,
+        areLastLevelTargetsNotified: false,
+        isAcknowledged: false,
+      })
+
+      const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.healthy })
+      persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
+        getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
+        getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
+      })
+
+      timerServiceAdapterMock = buildTimerServiceAdapterMock()
+
+      subject = new ReceiveAcknowledgementTimeout(
+        escalationPolicyServiceAdapterMock,
+        smsServiceAdapterMock,
+        persistanceServiceAdapterMock,
+        timerServiceAdapterMock,
+      )
+    })
+
+    it('the Pager does not notify any Target', () => {
+      subject.perform({ monitoredServiceId: 1 })
+
+      expect(smsServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
+      expect(mailServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
+    })
+
+    it('the Pager does not set any acknowledgement delay', () => {
+      subject.perform({ monitoredServiceId: 1 })
+
+      expect(timerServiceAdapterMock.setTimerForAlert).not.toHaveBeenCalled()
+    })
+  })
 
   describe('given a Monitored Service in an Unhealthy State', () => {
     describe('and the corresponding Alert is not Acknowledged', () => {
@@ -51,8 +104,10 @@ describe('ReceiveAcknowledgementTimeout', () => {
           areLastLevelTargetsNotified: false,
           isAcknowledged: false,
         })
+        const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.unhealthy })
         persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
+          getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
         })
 
         timerServiceAdapterMock = buildTimerServiceAdapterMock()
@@ -77,7 +132,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
           expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledTimes(1)
           expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledWith(15, {
             areLastLevelTargetsNotified: false,
-            isAcknowledge: false,
+            isAcknowledged: false,
             monitoredServiceId: 1,
           })
         })
@@ -106,8 +161,10 @@ describe('ReceiveAcknowledgementTimeout', () => {
           areLastLevelTargetsNotified: false,
           isAcknowledged: true,
         })
+        const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.unhealthy })
         persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
+          getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
         })
 
         timerServiceAdapterMock = buildTimerServiceAdapterMock()

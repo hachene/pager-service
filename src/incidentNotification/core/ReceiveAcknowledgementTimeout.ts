@@ -3,6 +3,7 @@ import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
 import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
 import { AcknowledgementTimeout } from './models/AcknowledgementTimeout'
+import { MonitoredServiceStatus } from './models/MonitoredService'
 import { SmsTarget } from './models/Target/SmsTarget'
 
 export class ReceiveAcknowledgementTimeout {
@@ -24,6 +25,9 @@ export class ReceiveAcknowledgementTimeout {
   }
 
   public perform({ monitoredServiceId }: ReceiveAcknowledgementTimeoutParams): void {
+    const monitoredService = this.persistance.getMonitoredServiceById(monitoredServiceId)
+    if (monitoredService.status !== MonitoredServiceStatus.unhealthy) return
+
     const alert = this.persistance.getAlertByMonitoredServiceId(monitoredServiceId)
     if (alert.isAcknowledged || alert.areLastLevelTargetsNotified) return
 
