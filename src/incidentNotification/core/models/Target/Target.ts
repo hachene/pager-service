@@ -1,9 +1,10 @@
-export class Target {
-  public type: TargetType
+import { NotificationServiceInterface } from '../../../ports/outgoing/NotificationServiceInterface'
+import { Alert } from '../Alert'
 
-  constructor({ type }: Partial<Target>) {
-    this.type = type
-  }
+export interface Target {
+  type: TargetType
+  notificationService: NotificationServiceInterface
+  notifyTarget(alert: Alert): void
 }
 
 export enum TargetType {

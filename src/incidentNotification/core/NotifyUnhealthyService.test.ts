@@ -2,10 +2,12 @@ import {
   buildEscalationPolicyServiceAdapterMock,
   buildMailServiceAdapterMock,
   buildPersistanceInterfaceAdapterMock,
+  buildSmsServiceAdapterMock,
   buildTimerServiceAdapterMock,
 } from '../../testUtils/mocks'
 import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
 import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
+import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
 import { Alert } from './models/Alert'
 import { EscalationPolicy } from './models/EscalationPolicy'
@@ -20,6 +22,8 @@ describe('NotifyUnhealthyService', () => {
 
   let persistanceAdapterMock: PersistanceInterface
   let mailServiceAdapterMock: MailServiceInterface
+  let smsServiceAdapterMock: SmsServiceInterface
+
   let timerServiceAdapterMock: TimerServiceInterface
 
   afterEach(() => jest.clearAllMocks())
@@ -31,13 +35,16 @@ describe('NotifyUnhealthyService', () => {
         getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
       })
 
+      mailServiceAdapterMock = buildMailServiceAdapterMock()
+      smsServiceAdapterMock = buildSmsServiceAdapterMock()
+
       const targetsFirstLevel = [
-        new EmailTarget({ emailAddress: 'raquel@aircall.com' }),
-        new EmailTarget({ emailAddress: 'juan@aircall.com' }),
+        new EmailTarget({ emailAddress: 'raquel@aircall.com', notificationService: mailServiceAdapterMock }),
+        new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
       ]
       const targetsLastLevel = [
-        new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' }),
-        new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' }),
+        new EmailTarget({ emailAddress: 'juan@aircall.com', notificationService: mailServiceAdapterMock }),
+        new SmsTarget({ phoneNumber: '+ 33 1 42 00 00 00', notificationService: smsServiceAdapterMock }),
       ]
       const returnedEscalationPolicy = new EscalationPolicy({
         monitoredServiceId: 1,
@@ -47,13 +54,11 @@ describe('NotifyUnhealthyService', () => {
         getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
       })
 
-      mailServiceAdapterMock = buildMailServiceAdapterMock()
       timerServiceAdapterMock = buildTimerServiceAdapterMock()
 
       subject = new NotifyUnhealthyService(
         persistanceAdapterMock,
         escalationPolicyServiceAdapterMock,
-        mailServiceAdapterMock,
         timerServiceAdapterMock,
       )
     })
@@ -75,11 +80,10 @@ describe('NotifyUnhealthyService', () => {
       it('the Pager notifies all targets of the first level of the escalation policy', () => {
         subject.perform(alert)
 
-        expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(2)
-        expect(mailServiceAdapterMock.sendAlert['mock'].calls).toEqual([
-          ['raquel@aircall.com', { monitoredServiceId: 1 }],
-          ['juan@aircall.com', { monitoredServiceId: 1 }],
-        ])
+        expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(1)
+        expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledWith('raquel@aircall.com', { monitoredServiceId: 1 })
+        expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(1)
+        expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledWith('+ 33 1 40 00 00 00', { monitoredServiceId: 1 })
       })
 
       it('sets a 15-minutes acknowledgement delay', () => {
@@ -105,7 +109,6 @@ describe('NotifyUnhealthyService', () => {
         subject = new NotifyUnhealthyService(
           persistanceAdapterMock,
           buildEscalationPolicyServiceAdapterMock(),
-          mailServiceAdapterMock,
           timerServiceAdapterMock,
         )
       })

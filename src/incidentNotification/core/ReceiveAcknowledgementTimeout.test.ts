@@ -26,8 +26,15 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
   describe('given a Monitored Service in a Healthy State', () => {
     beforeEach(() => {
-      const targetsFirstLevel = [new EmailTarget({ emailAddress: 'raquel@aircall.com' })]
-      const targetsLastLevel = [new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' })]
+      smsServiceAdapterMock = buildSmsServiceAdapterMock()
+      mailServiceAdapterMock = buildMailServiceAdapterMock()
+
+      const targetsFirstLevel = [
+        new EmailTarget({ emailAddress: 'raquel@aircall.com', notificationService: mailServiceAdapterMock }),
+      ]
+      const targetsLastLevel = [
+        new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
+      ]
       const returnedEscalationPolicy = new EscalationPolicy({
         monitoredServiceId: 1,
         levels: [targetsFirstLevel, targetsLastLevel],
@@ -36,9 +43,6 @@ describe('ReceiveAcknowledgementTimeout', () => {
       const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
         getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
       })
-
-      smsServiceAdapterMock = buildSmsServiceAdapterMock()
-      mailServiceAdapterMock = buildMailServiceAdapterMock()
 
       const returnedAlert = new Alert({
         monitoredServiceId: 1,
@@ -56,7 +60,6 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
       subject = new ReceiveAcknowledgementTimeout(
         escalationPolicyServiceAdapterMock,
-        smsServiceAdapterMock,
         persistanceServiceAdapterMock,
         timerServiceAdapterMock,
       )
@@ -79,13 +82,16 @@ describe('ReceiveAcknowledgementTimeout', () => {
   describe('given a Monitored Service in an Unhealthy State', () => {
     describe('and the corresponding Alert is not Acknowledged', () => {
       beforeEach(() => {
+        smsServiceAdapterMock = buildSmsServiceAdapterMock()
+        mailServiceAdapterMock = buildMailServiceAdapterMock()
+
         const targetsFirstLevel = [
-          new EmailTarget({ emailAddress: 'raquel@aircall.com' }),
-          new EmailTarget({ emailAddress: 'juan@aircall.com' }),
+          new EmailTarget({ emailAddress: 'raquel@aircall.com', notificationService: mailServiceAdapterMock }),
+          new EmailTarget({ emailAddress: 'juan@aircall.com', notificationService: mailServiceAdapterMock }),
         ]
         const targetsLastLevel = [
-          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' }),
-          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' }),
+          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
+          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
         ]
         const returnedEscalationPolicy = new EscalationPolicy({
           monitoredServiceId: 1,
@@ -95,9 +101,6 @@ describe('ReceiveAcknowledgementTimeout', () => {
         const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
           getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
         })
-
-        smsServiceAdapterMock = buildSmsServiceAdapterMock()
-        mailServiceAdapterMock = buildMailServiceAdapterMock()
 
         const returnedAlert = new Alert({
           monitoredServiceId: 1,
@@ -114,7 +117,6 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
         subject = new ReceiveAcknowledgementTimeout(
           escalationPolicyServiceAdapterMock,
-          smsServiceAdapterMock,
           persistanceServiceAdapterMock,
           timerServiceAdapterMock,
         )
@@ -141,8 +143,15 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
     describe('and the corresponding Alert is Acknowledged', () => {
       beforeEach(() => {
-        const targetsFirstLevel = [new EmailTarget({ emailAddress: 'raquel@aircall.com' })]
-        const targetsLastLevel = [new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00' })]
+        smsServiceAdapterMock = buildSmsServiceAdapterMock()
+        mailServiceAdapterMock = buildMailServiceAdapterMock()
+
+        const targetsFirstLevel = [
+          new EmailTarget({ emailAddress: 'raquel@aircall.com', notificationService: mailServiceAdapterMock }),
+        ]
+        const targetsLastLevel = [
+          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
+        ]
 
         const returnedEscalationPolicy = new EscalationPolicy({
           monitoredServiceId: 1,
@@ -152,9 +161,6 @@ describe('ReceiveAcknowledgementTimeout', () => {
         const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
           getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
         })
-
-        smsServiceAdapterMock = buildSmsServiceAdapterMock()
-        mailServiceAdapterMock = buildMailServiceAdapterMock()
 
         const returnedAlert = new Alert({
           monitoredServiceId: 1,
@@ -171,7 +177,6 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
         subject = new ReceiveAcknowledgementTimeout(
           escalationPolicyServiceAdapterMock,
-          smsServiceAdapterMock,
           persistanceServiceAdapterMock,
           timerServiceAdapterMock,
         )
