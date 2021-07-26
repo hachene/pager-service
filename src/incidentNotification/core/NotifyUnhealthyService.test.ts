@@ -86,6 +86,51 @@ describe('NotifyUnhealthyService', () => {
         expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledWith('+ 33 1 40 00 00 00', { monitoredServiceId: 1 })
       })
 
+      it('the Pager does not notify targets with an active alert', () => {
+        const targetsFirstLevel = [
+          new EmailTarget({
+            emailAddress: 'raquel@aircall.com',
+            notificationService: mailServiceAdapterMock,
+            hasActiveAlert: false,
+          }),
+          new SmsTarget({
+            phoneNumber: '+ 33 1 40 00 00 00',
+            notificationService: smsServiceAdapterMock,
+            hasActiveAlert: false,
+          }),
+          new EmailTarget({
+            emailAddress: 'juan@aircall.com',
+            notificationService: mailServiceAdapterMock,
+            hasActiveAlert: true,
+          }),
+          new SmsTarget({
+            phoneNumber: '+ 33 1 42 00 00 00',
+            notificationService: smsServiceAdapterMock,
+            hasActiveAlert: true,
+          }),
+        ]
+        const returnedEscalationPolicy = new EscalationPolicy({
+          monitoredServiceId: 1,
+          levels: [targetsFirstLevel],
+        })
+        const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
+          getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
+        })
+
+        subject = new NotifyUnhealthyService(
+          persistanceAdapterMock,
+          escalationPolicyServiceAdapterMock,
+          timerServiceAdapterMock,
+        )
+
+        subject.perform(alert)
+
+        expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(1)
+        expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledWith('raquel@aircall.com', { monitoredServiceId: 1 })
+        expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(1)
+        expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledWith('+ 33 1 40 00 00 00', { monitoredServiceId: 1 })
+      })
+
       it('sets a 15-minutes acknowledgement delay', () => {
         subject.perform(alert)
 
