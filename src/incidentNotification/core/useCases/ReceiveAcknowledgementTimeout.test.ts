@@ -1,20 +1,20 @@
 import {
-  buildEscalationPolicyServiceAdapterMock,
-  buildMailServiceAdapterMock,
-  buildPersistanceInterfaceAdapterMock,
   buildSmsServiceAdapterMock,
+  buildMailServiceAdapterMock,
+  buildEscalationPolicyServiceAdapterMock,
+  buildPersistanceInterfaceAdapterMock,
   buildTimerServiceAdapterMock,
-} from '../../testUtils/mocks'
-import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
-import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
-import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
-import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
-import { AcknowledgementTimeout } from './models/AcknowledgementTimeout'
-import { Alert } from './models/Alert'
-import { EscalationPolicy } from './models/EscalationPolicy'
-import { MonitoredService, MonitoredServiceStatus } from './models/MonitoredService'
-import { EmailTarget } from './models/Target/EmailTarget'
-import { SmsTarget } from './models/Target/SmsTarget'
+} from '../../../testUtils/mocks'
+import { MailServiceInterface } from '../../ports/outgoing/MailServiceInterface'
+import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { SmsServiceInterface } from '../../ports/outgoing/SmsServiceInterface'
+import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
+import { AcknowledgementTimeout } from '../models/AcknowledgementTimeout'
+import { Alert } from '../models/Alert'
+import { EscalationPolicy } from '../models/EscalationPolicy'
+import { MonitoredService, MonitoredServiceStatus } from '../models/MonitoredService'
+import { EmailTarget } from '../models/Target/EmailTarget'
+import { SmsTarget } from '../models/Target/SmsTarget'
 import { ReceiveAcknowledgementTimeout } from './ReceiveAcknowledgementTimeout'
 
 describe('ReceiveAcknowledgementTimeout', () => {

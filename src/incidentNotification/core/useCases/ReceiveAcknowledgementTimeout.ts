@@ -1,8 +1,8 @@
-import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
-import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
-import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
-import { AcknowledgementTimeout } from './models/AcknowledgementTimeout'
-import { MonitoredServiceStatus } from './models/MonitoredService'
+import { EscalationPolicyServiceInterface } from '../../ports/outgoing/EscalationPolicyServiceInterface'
+import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
+import { AcknowledgementTimeout } from '../models/AcknowledgementTimeout'
+import { MonitoredServiceStatus } from '../models/MonitoredService'
 
 export class ReceiveAcknowledgementTimeout {
   private escalationPolicyService: EscalationPolicyServiceInterface

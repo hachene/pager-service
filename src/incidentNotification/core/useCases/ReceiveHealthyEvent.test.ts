@@ -1,7 +1,7 @@
-import { buildPersistanceInterfaceAdapterMock } from '../../testUtils/mocks'
-import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
-import { HealthyEvent } from './models/HealthyEvent'
-import { MonitoredService, MonitoredServiceStatus } from './models/MonitoredService'
+import { buildPersistanceInterfaceAdapterMock } from '../../../testUtils/mocks'
+import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { HealthyEvent } from '../models/HealthyEvent'
+import { MonitoredService, MonitoredServiceStatus } from '../models/MonitoredService'
 import { ReceiveHealthyEvent } from './ReceiveHealthyEvent'
 
 describe('ReceiveHealthyEvent', () => {

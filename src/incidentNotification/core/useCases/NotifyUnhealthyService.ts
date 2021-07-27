@@ -1,8 +1,8 @@
-import { EscalationPolicyServiceInterface } from '../ports/outgoing/EscalationPolicyServiceInterface'
-import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
-import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
-import { Alert } from './models/Alert'
-import { MonitoredServiceStatus } from './models/MonitoredService'
+import { EscalationPolicyServiceInterface } from '../../ports/outgoing/EscalationPolicyServiceInterface'
+import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
+import { Alert } from '../models/Alert'
+import { MonitoredServiceStatus } from '../models/MonitoredService'
 
 const MINUTES_FOR_ALERT_TIMER_TIMEOUT = 15
 

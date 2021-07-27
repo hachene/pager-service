@@ -1,5 +1,5 @@
-import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
-import { HealthyEvent } from './models/HealthyEvent'
+import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { HealthyEvent } from '../models/HealthyEvent'
 
 export class ReceiveHealthyEvent {
   private persistance: PersistanceInterface

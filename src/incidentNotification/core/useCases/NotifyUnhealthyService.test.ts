@@ -4,16 +4,16 @@ import {
   buildPersistanceInterfaceAdapterMock,
   buildSmsServiceAdapterMock,
   buildTimerServiceAdapterMock,
-} from '../../testUtils/mocks'
-import { MailServiceInterface } from '../ports/outgoing/MailServiceInterface'
-import { PersistanceInterface } from '../ports/outgoing/PersistanceInterface'
-import { SmsServiceInterface } from '../ports/outgoing/SmsServiceInterface'
-import { TimerServiceInterface } from '../ports/outgoing/TimerServiceInterface'
-import { Alert } from './models/Alert'
-import { EscalationPolicy } from './models/EscalationPolicy'
-import { MonitoredService, MonitoredServiceStatus } from './models/MonitoredService'
-import { EmailTarget } from './models/Target/EmailTarget'
-import { SmsTarget } from './models/Target/SmsTarget'
+} from '../../../testUtils/mocks'
+import { MailServiceInterface } from '../../ports/outgoing/MailServiceInterface'
+import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { SmsServiceInterface } from '../../ports/outgoing/SmsServiceInterface'
+import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
+import { Alert } from '../models/Alert'
+import { EscalationPolicy } from '../models/EscalationPolicy'
+import { MonitoredService, MonitoredServiceStatus } from '../models/MonitoredService'
+import { EmailTarget } from '../models/Target/EmailTarget'
+import { SmsTarget } from '../models/Target/SmsTarget'
 import { NotifyUnhealthyService } from './NotifyUnhealthyService'
 
 describe('NotifyUnhealthyService', () => {
