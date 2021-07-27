@@ -19,7 +19,7 @@ export class ReceiveAcknowledgementTimeout {
     this.timerService = timerService
   }
 
-  public perform({ monitoredServiceId }: ReceiveAcknowledgementTimeoutParams): void {
+  public perform({ monitoredServiceId }: AcknowledgementTimeout): void {
     const monitoredService = this.persistence.getMonitoredServiceById(monitoredServiceId)
     if (monitoredService.status !== MonitoredServiceStatus.unhealthy) return
 
@@ -33,5 +33,3 @@ export class ReceiveAcknowledgementTimeout {
     this.timerService.setTimerForAlert(15, alert)
   }
 }
-
-type ReceiveAcknowledgementTimeoutParams = AcknowledgementTimeout

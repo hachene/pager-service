@@ -21,7 +21,7 @@ export class NotifyUnhealthyService {
     this.timerService = timerService
   }
 
-  public perform(alert: NotifyUnhealthyServiceParams): void {
+  public perform(alert: Alert): void {
     const { monitoredServiceId } = alert
 
     const monitoredService = this.persistence.getMonitoredServiceById(monitoredServiceId)
@@ -36,5 +36,3 @@ export class NotifyUnhealthyService {
     this.timerService.setTimerForAlert(MINUTES_FOR_ALERT_TIMER_TIMEOUT, alert)
   }
 }
-
-type NotifyUnhealthyServiceParams = Alert
