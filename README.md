@@ -4,7 +4,7 @@ This repository holds a part of the models and business logic to implement a Pag
 
 ## 🚀️ Quick Start
 
-To launch the tests you can clone the repository and trigger the execution with the following steps:
+To launch the tests simply clone the repository and trigger the execution with the following steps:
 
 ```
 git clone git@github.com:hachene/pager-service.git
@@ -19,7 +19,7 @@ This will also generate a coverage report.
 
 The repository covers three different use cases:
 
-### `NotifyUnhealthyService`
+### ▶️ `NotifyUnhealthyService`
 This vertical is responsible for:
 
 **Scenario 1**
@@ -39,7 +39,7 @@ then the Pager doesn’t notify any Target
 and doesn’t set an acknowledgement delay
 ```
 
-### `ReceiveAcknowledgementTimeout`
+### ▶️ `ReceiveAcknowledgementTimeout`
 This vertical is responsible for:
 
 **Scenario 3**
@@ -75,9 +75,13 @@ and doesn’t set an acknowledgement delay
 
 (\*\*) For the sake of preventing the violation of the SRP, the action of receiving a Healthy Event is not modeled in this use case but implemented in the `ReceiveHealthyEvent` Use Case.
 
-### `ReceiveHealthyEvent`
+### ▶️ `ReceiveHealthyEvent`
 
 As mentioned above, this vertical simply takes care of receiving a Healthy Event and sets the associated Monitored Service in a Healthy State.
+
+## 🏗️ Project Architecture
+
+
 
 
 ## 🤗️ Acknowledgements
