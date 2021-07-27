@@ -1,6 +1,6 @@
 # pager-service
 
-This repository holds a part of the models and business logic to implement a Pager Service to manage on-call shifts in a company that have several services that need to be monitored.
+This repository holds a part of the models and business logic to implement a Pager Service to manage on-call shifts in a company that has several services that need to be monitored.
 
 ## 🚀️ Quick Start
 
