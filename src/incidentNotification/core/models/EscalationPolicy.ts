@@ -9,4 +9,8 @@ export class EscalationPolicy {
     this.monitoredServiceId = monitoredServiceId
     this.levels = levels
   }
+
+  public getFirstLevelTargets(): Target[] {
+    return this.levels[0]
+  }
 }
