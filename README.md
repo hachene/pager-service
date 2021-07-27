@@ -96,9 +96,9 @@ Since this is an uncompleted application, the folder structure is not fully popu
 └── testUtils
 ```
 
-The code is organized in contexts related to the main business concepts. For this case, the only context created is `incidentNotification` since all the business logic implemented is somehow related to this idea.
+The code is organized in contexts related to the main business concepts. For this case, the only context created is `incidentNotification` since all the business logic implemented is, somehow, related to this idea.
 
-Under a directory with the same name, `incidentNotification`, we find the folder `core` that holds all the different use cases (`core/useCases` directory) and the models needed to implement the whole vertical (`core/models`).
+Under a directory with the same name, `incidentNotification`, we find the folder `core` that holds all the different Use Cases (`core/useCases` directory) and the models needed to implement the whole vertical (`core/models`).
 
 The communication between the Use Cases (core) and the Application layer (controllers, cron jobs, command-line clients, queues, etc) as well as with the Infrastructure layer (databases, outgoing queues, etc) is done via Ports. These Ports are implemented using TypeScript interfaces, so the dependency flow is inverted.
 
@@ -113,18 +113,18 @@ For persistence, the `PersistanceInterface` has been built to enforce the implem
 - `getMonitoredServiceById`  Given a Monitored Service Id it will return the associated Monitored Service.
 - `getAlertByMonitoredServiceId` Given a Monitored Service Id it will return an Alert Related to that Monitored Service.
 
-Using a SQL database we could create several tables, one per model, and some of them may need to have foreign keys to make relations with Monitored Services (for instance, an Alert or an AcknowledgementTimeout are related to Monitored Services 1:1).
+Using a relational database we could create several tables, one per model, and some of them may need to have foreign keys to make relations with Monitored Services (for instance, an Alert or an AcknowledgementTimeout are related to Monitored Services 1:1).
 
-The database is also used to guarantee the pager-service does not send an alert to the same target if they already have an active alert. Because of this, persisting the Target model in the database when a Target is alerted is crucial for the well functioning of the pager.
+The database is also used to guarantee the pager-service does not send an Alert to the same Target if they already have an active Alert. Because of this, persisting the Target model in the database when a Target is alerted is crucial for the well functioning of the pager.
 
 ## 🏃‍♀️ Next Steps
 
 This is an uncompleted project, the written code is a demonstration of how a pager-service could be implemented so there are multiple things to keep working on. Here are some interesting points to take into account:
 
-- As explained in the previous section, when an Alert is sent to a Target, we need to persist it in the database to prevent the same target to be alerted twice. This and other model persisting actions have not been implemented for the sake of simplicity.
-- The way the escalation levels are retrieved is quite fragile since it relies on the fact that there is an array with only two elements, being the position `0` the first level and `1` the last one.
+- As explained in the previous section, when an Alert is sent to a Target, we need to persist it in the database to prevent the same Target to be alerted twice. This and other model persisting actions have not been implemented for the sake of simplicity.
+- The way the Escalation Levels are retrieved is quite fragile since it relies on the fact that there is an array with only two elements, being the position `0` the first level and `1` the last one.
 - Since the adapters are not implemented, some of the tests needed too much mocking, making some of them a bit coupled to the implementation since, the tester, needs to know too much about the implementation of the UseCases. Here, some external modules could be created to test the proper integration with the adapters.
-- The Use Cases should be implementing an interface, as well, to expose an incoming port where their execution can be triggered without coupling it to a specific implementation.
+- The Use Cases should be implementing an interface, as well, to expose an incoming Port where their execution can be triggered without coupling it to a specific implementation.
 
 ## 🤗️ Acknowledgements
 
