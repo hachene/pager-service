@@ -33,6 +33,8 @@ export class NotifyUnhealthyService {
     const firstLevelTargets = escalationPolicy.getFirstLevelTargets()
     firstLevelTargets.map((target) => target.notifyTarget(alert))
 
+    this.persistence.incrementLastLevelContactedForAlert(alert.id)
+
     this.timerService.setTimerForAlert(MINUTES_FOR_ALERT_TIMER_TIMEOUT, alert)
   }
 }

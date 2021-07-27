@@ -138,6 +138,13 @@ describe('NotifyUnhealthyService', () => {
         expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledTimes(1)
         expect(timerServiceAdapterMock.setTimerForAlert).toHaveBeenCalledWith(15, { monitoredServiceId: 1 })
       })
+
+      it('the Pager marks the following level of targets as notified', () => {
+        subject.perform(alert)
+
+        expect(persistenceAdapterMock.incrementLastLevelContactedForAlert).toHaveBeenCalledTimes(1)
+        expect(persistenceAdapterMock.incrementLastLevelContactedForAlert).toHaveBeenCalledWith(alert.id)
+      })
     })
   })
 

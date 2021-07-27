@@ -7,4 +7,5 @@ export interface PersistenceInterface {
   getMonitoredServiceById(id: MonitoredService['id']): MonitoredService
   getAlertByMonitoredServiceId(monitoredServiceId: MonitoredService['id']): Alert
   markAlertAsAcknowledged(id: Alert['id']): void
+  incrementLastLevelContactedForAlert(id: Alert['id']): void
 }
