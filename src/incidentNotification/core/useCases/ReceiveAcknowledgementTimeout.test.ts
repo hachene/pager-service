@@ -96,13 +96,15 @@ describe('ReceiveAcknowledgementTimeout', () => {
           new EmailTarget({ emailAddress: 'raquel@aircall.com', notificationService: mailServiceAdapterMock }),
           new EmailTarget({ emailAddress: 'juan@aircall.com', notificationService: mailServiceAdapterMock }),
         ]
+        const targetsSecondLevel = [
+          new SmsTarget({ phoneNumber: '+ 33 1 41 00 00 00', notificationService: smsServiceAdapterMock }),
+        ]
         const targetsLastLevel = [
-          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
-          new SmsTarget({ phoneNumber: '+ 33 1 40 00 00 00', notificationService: smsServiceAdapterMock }),
+          new SmsTarget({ phoneNumber: '+ 33 1 55 55 55 55', notificationService: smsServiceAdapterMock }),
         ]
         const returnedEscalationPolicy = new EscalationPolicy({
           monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
-          levels: [targetsFirstLevel, targetsLastLevel],
+          levels: [targetsFirstLevel, targetsSecondLevel, targetsLastLevel],
         })
 
         const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
@@ -113,6 +115,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
           monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           areLastLevelTargetsNotified: false,
           isAcknowledged: false,
+          lastTargetsLevelNotified: 0,
         })
         const returnedMonitoredService = new MonitoredService({
           id: monitoredServiceId,
@@ -136,7 +139,13 @@ describe('ReceiveAcknowledgementTimeout', () => {
         it('the Pager notifies all targets of the next level of the escalation policy when receive a timeout', () => {
           subject.perform(acknowledgementTimeout)
 
-          expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(2)
+          expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(1)
+          expect(smsServiceAdapterMock.sendAlert).toHaveBeenCalledWith('+ 33 1 41 00 00 00', {
+            areLastLevelTargetsNotified: false,
+            isAcknowledged: false,
+            lastTargetsLevelNotified: 0,
+            monitoredServiceId: 1,
+          })
         })
         it('the Pager sets a 15-minutes acknowledgement delay', () => {
           subject.perform(acknowledgementTimeout)
@@ -146,6 +155,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
             areLastLevelTargetsNotified: false,
             isAcknowledged: false,
             monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
+            lastTargetsLevelNotified: 0,
           })
         })
       })

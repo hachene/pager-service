@@ -27,8 +27,8 @@ export class ReceiveAcknowledgementTimeout {
     if (alert.isAcknowledged || alert.areLastLevelTargetsNotified) return
 
     const escalationPolicy = this.escalationPolicyService.getEscalationPolicyByServiceId(alert.monitoredServiceId)
-    const lastLevelTargets = escalationPolicy.levels[1]
-    lastLevelTargets.map((target) => target.notifyTarget(alert))
+    const lastLevelTargets = alert.getNextTargetsLevelToBeNotified(escalationPolicy)
+    if (lastLevelTargets) lastLevelTargets.map((target) => target.notifyTarget(alert))
 
     this.timerService.setTimerForAlert(15, alert)
   }
