@@ -6,4 +6,5 @@ export interface PersistenceInterface {
   markMonitoredServiceAsHealthy(id: MonitoredService['id']): void
   getMonitoredServiceById(id: MonitoredService['id']): MonitoredService
   getAlertByMonitoredServiceId(monitoredServiceId: MonitoredService['id']): Alert
+  markAlertAsAcknowledged(id: Alert['id']): void
 }

@@ -1,4 +1,5 @@
 export class Alert {
+  public id: number
   public monitoredServiceId: number
   public isAcknowledged: boolean
   public areLastLevelTargetsNotified: boolean
