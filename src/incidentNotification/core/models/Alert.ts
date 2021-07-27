@@ -4,8 +4,8 @@ import { Target } from './Target/Target'
 export class Alert {
   public id: number
   public monitoredServiceId: number
-  public isAcknowledged: boolean
-  public areLastLevelTargetsNotified: boolean
+  public isAcknowledged?: boolean
+  public areLastLevelTargetsNotified?: boolean
   public lastTargetsLevelNotified?: number
 
   constructor({
@@ -13,7 +13,7 @@ export class Alert {
     isAcknowledged,
     areLastLevelTargetsNotified,
     lastTargetsLevelNotified,
-  }: Partial<Alert> & { monitoredServiceId: number }) {
+  }: AlertInitParams) {
     this.monitoredServiceId = monitoredServiceId
     this.isAcknowledged = isAcknowledged
     this.areLastLevelTargetsNotified = areLastLevelTargetsNotified
@@ -26,4 +26,12 @@ export class Alert {
     const nextLevelIndex = this.lastTargetsLevelNotified + 1
     return escalationPolicy.levels[nextLevelIndex]
   }
+}
+
+type AlertInitParams = {
+  id: number
+  monitoredServiceId: number
+  isAcknowledged?: boolean
+  areLastLevelTargetsNotified?: boolean
+  lastTargetsLevelNotified?: number
 }

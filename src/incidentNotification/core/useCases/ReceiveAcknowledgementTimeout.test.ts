@@ -49,6 +49,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
       })
 
       const returnedAlert = new Alert({
+        id: 1,
         monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
         areLastLevelTargetsNotified: false,
         isAcknowledged: false,
@@ -112,6 +113,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         })
 
         const returnedAlert = new Alert({
+          id: 1,
           monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           areLastLevelTargetsNotified: false,
           isAcknowledged: false,
@@ -183,6 +185,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         })
 
         const returnedAlert = new Alert({
+          id: 1,
           monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
           areLastLevelTargetsNotified: false,
           isAcknowledged: true,

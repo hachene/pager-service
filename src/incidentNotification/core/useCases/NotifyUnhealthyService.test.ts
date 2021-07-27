@@ -67,6 +67,7 @@ describe('NotifyUnhealthyService', () => {
     describe('when the Pager receives an Alert related to this Monitored Service', () => {
       beforeAll(() => {
         alert = new Alert({
+          id: 1,
           monitoredServiceId: 1,
         })
       })

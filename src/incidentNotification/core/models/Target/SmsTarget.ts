@@ -8,7 +8,7 @@ export class SmsTarget implements Target {
   public notificationService: SmsServiceInterface
   public hasActiveAlert: boolean
 
-  constructor({ phoneNumber, notificationService, hasActiveAlert = false }: Partial<SmsTarget>) {
+  constructor({ phoneNumber, notificationService, hasActiveAlert = false }: SmsTargetInitParams) {
     this.type = TargetType.sms
     this.phoneNumber = phoneNumber
     this.notificationService = notificationService
@@ -19,4 +19,10 @@ export class SmsTarget implements Target {
     if (this.hasActiveAlert) return
     this.notificationService.sendAlert(this.phoneNumber, alert)
   }
+}
+
+type SmsTargetInitParams = {
+  phoneNumber: string
+  notificationService: SmsServiceInterface
+  hasActiveAlert?: boolean
 }

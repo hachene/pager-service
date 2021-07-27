@@ -8,7 +8,7 @@ export class EmailTarget implements Target {
   public notificationService: MailServiceInterface
   public hasActiveAlert: boolean
 
-  constructor({ emailAddress, notificationService, hasActiveAlert = false }: Partial<EmailTarget>) {
+  constructor({ emailAddress, notificationService, hasActiveAlert = false }: EmailTargetInitParams) {
     this.type = TargetType.email
     this.notificationService = notificationService
     this.emailAddress = emailAddress
@@ -19,4 +19,10 @@ export class EmailTarget implements Target {
     if (this.hasActiveAlert) return
     this.notificationService.sendAlert(this.emailAddress, alert)
   }
+}
+
+type EmailTargetInitParams = {
+  emailAddress: string
+  notificationService: MailServiceInterface
+  hasActiveAlert?: boolean
 }
