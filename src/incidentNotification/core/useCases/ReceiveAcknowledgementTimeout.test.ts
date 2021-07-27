@@ -5,6 +5,7 @@ import {
   buildPersistenceInterfaceAdapterMock,
   buildTimerServiceAdapterMock,
 } from '../../../testUtils/mocks'
+import { EscalationPolicyServiceInterface } from '../../ports/outgoing/EscalationPolicyServiceInterface'
 import { MailServiceInterface } from '../../ports/outgoing/MailServiceInterface'
 import { PersistenceInterface } from '../../ports/outgoing/PersistenceInterface'
 import { SmsServiceInterface } from '../../ports/outgoing/SmsServiceInterface'
@@ -27,6 +28,9 @@ describe('ReceiveAcknowledgementTimeout', () => {
   let mailServiceAdapterMock: MailServiceInterface
   let persistenceServiceAdapterMock: PersistenceInterface
   let timerServiceAdapterMock: TimerServiceInterface
+  let escalationPolicyServiceAdapterMock: EscalationPolicyServiceInterface
+
+  afterEach(() => jest.clearAllMocks())
 
   describe('given a Monitored Service in a Healthy State', () => {
     beforeEach(() => {
@@ -108,7 +112,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
           levels: [targetsFirstLevel, targetsSecondLevel, targetsLastLevel],
         })
 
-        const escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
+        escalationPolicyServiceAdapterMock = buildEscalationPolicyServiceAdapterMock({
           getEscalationPolicyByServiceId: jest.fn(() => returnedEscalationPolicy),
         })
 
@@ -149,6 +153,35 @@ describe('ReceiveAcknowledgementTimeout', () => {
             monitoredServiceId: 1,
           })
         })
+
+        it('the Pager notifies the first level if the was not previous level notified', () => {
+          const returnedAlert = new Alert({
+            id: 1,
+            monitoredServiceId: acknowledgementTimeout.monitoredServiceId,
+            areLastLevelTargetsNotified: false,
+            isAcknowledged: false,
+            lastTargetsLevelNotified: undefined,
+          })
+          const returnedMonitoredService = new MonitoredService({
+            id: monitoredServiceId,
+            status: MonitoredServiceStatus.unhealthy,
+          })
+          persistenceServiceAdapterMock = buildPersistenceInterfaceAdapterMock({
+            getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
+            getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
+          })
+
+          subject = new ReceiveAcknowledgementTimeout(
+            escalationPolicyServiceAdapterMock,
+            persistenceServiceAdapterMock,
+            timerServiceAdapterMock,
+          )
+
+          subject.perform(acknowledgementTimeout)
+
+          expect(mailServiceAdapterMock.sendAlert).toHaveBeenCalledTimes(2)
+        })
+
         it('the Pager sets a 15-minutes acknowledgement delay', () => {
           subject.perform(acknowledgementTimeout)
 

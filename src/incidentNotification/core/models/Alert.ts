@@ -21,9 +21,7 @@ export class Alert {
   }
 
   public getNextTargetsLevelToBeNotified(escalationPolicy: EscalationPolicy): Target[] | undefined {
-    if (this.lastTargetsLevelNotified === undefined) return undefined
-
-    const nextLevelIndex = this.lastTargetsLevelNotified + 1
+    const nextLevelIndex = this.lastTargetsLevelNotified === undefined ? 0 : this.lastTargetsLevelNotified + 1
     return escalationPolicy.levels[nextLevelIndex]
   }
 }

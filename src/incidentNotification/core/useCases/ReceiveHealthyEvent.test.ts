@@ -23,6 +23,8 @@ describe('ReceiveHealthyEvent', () => {
     subject = new ReceiveHealthyEvent(persistenceInterfaceAdapterMock)
   })
 
+  afterEach(() => jest.clearAllMocks())
+
   describe('given a Monitored Service in an Unhealthy state', () => {
     it('sets the Monitored Service in a Healthy state', () => {
       subject.perform(healthyEvent)

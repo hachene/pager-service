@@ -16,6 +16,8 @@ describe('AcknowledgeAlert', () => {
     subject = new AcknowledgeAlert(persistenceInterfaceAdapterMock)
   })
 
+  afterEach(() => jest.clearAllMocks())
+
   describe('given a Monitored Service in an Unhealthy state', () => {
     it('sets the Monitored Service in a Healthy state', () => {
       subject.perform(acknowledgement)
