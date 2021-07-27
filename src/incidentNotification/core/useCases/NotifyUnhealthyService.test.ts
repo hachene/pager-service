@@ -1,3 +1,4 @@
+import { notDeepEqual } from 'assert'
 import {
   buildEscalationPolicyServiceAdapterMock,
   buildMailServiceAdapterMock,
@@ -149,6 +150,7 @@ describe('NotifyUnhealthyService', () => {
         })
 
         mailServiceAdapterMock = buildMailServiceAdapterMock()
+        smsServiceAdapterMock = buildSmsServiceAdapterMock()
         timerServiceAdapterMock = buildTimerServiceAdapterMock()
 
         subject = new NotifyUnhealthyService(
@@ -162,7 +164,7 @@ describe('NotifyUnhealthyService', () => {
         subject.perform(alert)
 
         expect(mailServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
-        // TODO: Ensure we are not calling the SmsService either
+        expect(mailServiceAdapterMock.sendAlert).not.toHaveBeenCalled()
       })
 
       it('the Pager does not set 15-minutes acknowledgement delay', () => {
