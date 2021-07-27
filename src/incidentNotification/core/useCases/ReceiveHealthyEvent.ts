@@ -1,14 +1,14 @@
-import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { PersistenceInterface } from '../../ports/outgoing/PersistenceInterface'
 import { HealthyEvent } from '../models/HealthyEvent'
 
 export class ReceiveHealthyEvent {
-  private persistance: PersistanceInterface
+  private persistence: PersistenceInterface
 
-  constructor(persistance: PersistanceInterface) {
-    this.persistance = persistance
+  constructor(persistence: PersistenceInterface) {
+    this.persistence = persistence
   }
 
   public perform({ monitoredServiceId }: HealthyEvent): void {
-    this.persistance.markMonitoredServiceAsHealthy(monitoredServiceId)
+    this.persistence.markMonitoredServiceAsHealthy(monitoredServiceId)
   }
 }

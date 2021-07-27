@@ -1,29 +1,29 @@
 import { EscalationPolicyServiceInterface } from '../../ports/outgoing/EscalationPolicyServiceInterface'
-import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { PersistenceInterface } from '../../ports/outgoing/PersistenceInterface'
 import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
 import { AcknowledgementTimeout } from '../models/AcknowledgementTimeout'
 import { MonitoredServiceStatus } from '../models/MonitoredService'
 
 export class ReceiveAcknowledgementTimeout {
   private escalationPolicyService: EscalationPolicyServiceInterface
-  private persistance: PersistanceInterface
+  private persistence: PersistenceInterface
   private timerService: TimerServiceInterface
 
   constructor(
     escalationPolicyService: EscalationPolicyServiceInterface,
-    persistance: PersistanceInterface,
+    persistence: PersistenceInterface,
     timerService: TimerServiceInterface,
   ) {
     this.escalationPolicyService = escalationPolicyService
-    this.persistance = persistance
+    this.persistence = persistence
     this.timerService = timerService
   }
 
   public perform({ monitoredServiceId }: ReceiveAcknowledgementTimeoutParams): void {
-    const monitoredService = this.persistance.getMonitoredServiceById(monitoredServiceId)
+    const monitoredService = this.persistence.getMonitoredServiceById(monitoredServiceId)
     if (monitoredService.status !== MonitoredServiceStatus.unhealthy) return
 
-    const alert = this.persistance.getAlertByMonitoredServiceId(monitoredServiceId)
+    const alert = this.persistence.getAlertByMonitoredServiceId(monitoredServiceId)
     if (alert.isAcknowledged || alert.areLastLevelTargetsNotified) return
 
     const escalationPolicy = this.escalationPolicyService.getEscalationPolicyByServiceId(alert.monitoredServiceId)

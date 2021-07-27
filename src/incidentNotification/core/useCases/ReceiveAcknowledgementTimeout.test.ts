@@ -2,11 +2,11 @@ import {
   buildSmsServiceAdapterMock,
   buildMailServiceAdapterMock,
   buildEscalationPolicyServiceAdapterMock,
-  buildPersistanceInterfaceAdapterMock,
+  buildPersistenceInterfaceAdapterMock,
   buildTimerServiceAdapterMock,
 } from '../../../testUtils/mocks'
 import { MailServiceInterface } from '../../ports/outgoing/MailServiceInterface'
-import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { PersistenceInterface } from '../../ports/outgoing/PersistenceInterface'
 import { SmsServiceInterface } from '../../ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
 import { AcknowledgementTimeout } from '../models/AcknowledgementTimeout'
@@ -25,7 +25,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
   let smsServiceAdapterMock: SmsServiceInterface
   let mailServiceAdapterMock: MailServiceInterface
-  let persistanceServiceAdapterMock: PersistanceInterface
+  let persistenceServiceAdapterMock: PersistenceInterface
   let timerServiceAdapterMock: TimerServiceInterface
 
   describe('given a Monitored Service in a Healthy State', () => {
@@ -58,7 +58,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
         id: monitoredServiceId,
         status: MonitoredServiceStatus.healthy,
       })
-      persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
+      persistenceServiceAdapterMock = buildPersistenceInterfaceAdapterMock({
         getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
         getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
       })
@@ -67,7 +67,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
       subject = new ReceiveAcknowledgementTimeout(
         escalationPolicyServiceAdapterMock,
-        persistanceServiceAdapterMock,
+        persistenceServiceAdapterMock,
         timerServiceAdapterMock,
       )
     })
@@ -118,7 +118,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
           id: monitoredServiceId,
           status: MonitoredServiceStatus.unhealthy,
         })
-        persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
+        persistenceServiceAdapterMock = buildPersistenceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
           getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
         })
@@ -127,7 +127,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
         subject = new ReceiveAcknowledgementTimeout(
           escalationPolicyServiceAdapterMock,
-          persistanceServiceAdapterMock,
+          persistenceServiceAdapterMock,
           timerServiceAdapterMock,
         )
       })
@@ -178,7 +178,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
           isAcknowledged: true,
         })
         const returnedMonitoredService = new MonitoredService({ id: 1, status: MonitoredServiceStatus.unhealthy })
-        persistanceServiceAdapterMock = buildPersistanceInterfaceAdapterMock({
+        persistenceServiceAdapterMock = buildPersistenceInterfaceAdapterMock({
           getAlertByMonitoredServiceId: jest.fn(() => returnedAlert),
           getMonitoredServiceById: jest.fn(() => returnedMonitoredService),
         })
@@ -187,7 +187,7 @@ describe('ReceiveAcknowledgementTimeout', () => {
 
         subject = new ReceiveAcknowledgementTimeout(
           escalationPolicyServiceAdapterMock,
-          persistanceServiceAdapterMock,
+          persistenceServiceAdapterMock,
           timerServiceAdapterMock,
         )
       })

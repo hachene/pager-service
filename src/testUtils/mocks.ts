@@ -1,6 +1,6 @@
 import { EscalationPolicyServiceInterface } from '../incidentNotification/ports/outgoing/EscalationPolicyServiceInterface'
 import { MailServiceInterface } from '../incidentNotification/ports/outgoing/MailServiceInterface'
-import { PersistanceInterface } from '../incidentNotification/ports/outgoing/PersistanceInterface'
+import { PersistenceInterface } from '../incidentNotification/ports/outgoing/PersistenceInterface'
 import { SmsServiceInterface } from '../incidentNotification/ports/outgoing/SmsServiceInterface'
 import { TimerServiceInterface } from '../incidentNotification/ports/outgoing/TimerServiceInterface'
 
@@ -20,9 +20,9 @@ export const buildMailServiceAdapterMock = (
   sendAlert: overwriteOptions?.sendAlert || jest.fn(),
 })
 
-export const buildPersistanceInterfaceAdapterMock = (
-  overwriteOptions?: Partial<PersistanceInterface>,
-): PersistanceInterface => ({
+export const buildPersistenceInterfaceAdapterMock = (
+  overwriteOptions?: Partial<PersistenceInterface>,
+): PersistenceInterface => ({
   getAlertByMonitoredServiceId: overwriteOptions?.getAlertByMonitoredServiceId || jest.fn(),
   getMonitoredServiceById: overwriteOptions?.getMonitoredServiceById || jest.fn(),
   markMonitoredServiceAsUnhealthy: overwriteOptions?.markMonitoredServiceAsUnhealthy || jest.fn(),

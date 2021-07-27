@@ -1,5 +1,5 @@
 import { EscalationPolicyServiceInterface } from '../../ports/outgoing/EscalationPolicyServiceInterface'
-import { PersistanceInterface } from '../../ports/outgoing/PersistanceInterface'
+import { PersistenceInterface } from '../../ports/outgoing/PersistenceInterface'
 import { TimerServiceInterface } from '../../ports/outgoing/TimerServiceInterface'
 import { Alert } from '../models/Alert'
 import { MonitoredServiceStatus } from '../models/MonitoredService'
@@ -7,16 +7,16 @@ import { MonitoredServiceStatus } from '../models/MonitoredService'
 const MINUTES_FOR_ALERT_TIMER_TIMEOUT = 15
 
 export class NotifyUnhealthyService {
-  private persistance: PersistanceInterface
+  private persistence: PersistenceInterface
   private escalationPolicyService: EscalationPolicyServiceInterface
   private timerService: TimerServiceInterface
 
   constructor(
-    persistanceInterface: PersistanceInterface,
+    persistenceInterface: PersistenceInterface,
     escalationPolicyService: EscalationPolicyServiceInterface,
     timerService: TimerServiceInterface,
   ) {
-    this.persistance = persistanceInterface
+    this.persistence = persistenceInterface
     this.escalationPolicyService = escalationPolicyService
     this.timerService = timerService
   }
@@ -24,10 +24,10 @@ export class NotifyUnhealthyService {
   public perform(alert: NotifyUnhealthyServiceParams): void {
     const { monitoredServiceId } = alert
 
-    const monitoredService = this.persistance.getMonitoredServiceById(monitoredServiceId)
+    const monitoredService = this.persistence.getMonitoredServiceById(monitoredServiceId)
     if (monitoredService.status === MonitoredServiceStatus.unhealthy) return
 
-    this.persistance.markMonitoredServiceAsUnhealthy(monitoredServiceId)
+    this.persistence.markMonitoredServiceAsUnhealthy(monitoredServiceId)
 
     const escalationPolicy = this.escalationPolicyService.getEscalationPolicyByServiceId(monitoredServiceId)
     const firstLevelTargets = escalationPolicy.levels[0]
