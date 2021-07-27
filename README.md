@@ -81,8 +81,30 @@ As mentioned above, this vertical simply takes care of receiving a Healthy Event
 
 ## 🏗️ Project Architecture
 
+The code has been written following a Ports and Adapters Architecture to keep the business logic fully decoupled from the infrastructure details.
+
+Since this is an uncompleted application, the folder structure is not fully populated either.
 
 
+```src
+├── incidentNotification
+│   ├── core
+│   │   ├── models
+│   │   └── useCases
+│   └── ports
+│       └── outgoing
+└── testUtils
+```
+
+The code is organized in contexts related to the main business concepts. For this case, the only context created is `incidentNotification` since all the business logic implemented is somehow related to this idea.
+
+Under a directory with the same name, `incidentNotification`, we find the folder `core` that holds all the different use cases (`core/useCases` directory) and the models needed to implement the whole vertical (`core/models`).
+
+The communication between the Use Cases (core) and the Application layer (controllers, cron jobs, command-line clients, queues, etc) as well as with the Infrastructure layer (databases, outgoing queues, etc) is done via Ports. These Ports are implemented using TypeScript interfaces.
+
+![pager-service-arch](https://user-images.githubusercontent.com/7657547/127133468-2a66b365-aafd-45f6-b767-0dbf28446fb9.png)
+ 
+For this exercise, just the outgoing Ports and the Core layers -colored in the previous diagram- have been coded. The rest of the layers have been mocked when testing the Use Cases.
 
 ## 🤗️ Acknowledgements
 
