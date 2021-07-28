@@ -124,8 +124,6 @@ For persistence, the `PersistanceInterface` has been built to enforce the implem
 
 Using a relational database we could create several tables, one per model, and some of them may need to have foreign keys to make relations with Monitored Services (for instance, an Alert or an AcknowledgementTimeout are related to Monitored Services 1:1).
 
-The database is also used to guarantee the pager-service does not send an Alert to the same Target if they already have an active Alert. Because of this, persisting the Target model in the database when a Target is alerted is crucial for the well functioning of the pager.
-
 ## 🏃‍♀️ Next Steps
 
 This is an uncompleted project, the written code is a demonstration of how a pager-service could be implemented so there are multiple things to keep working on. Here are some interesting points to take into account:
