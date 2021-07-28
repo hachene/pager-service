@@ -117,9 +117,10 @@ For persistence, the `PersistanceInterface` has been built to enforce the implem
 
 - `markMonitoredServiceAsUnhealthy` Given a Monitored Service Id it will mark it as Unhealthy.
 - `markMonitoredServiceAsHealthy` Given a Monitored Service Id it will mark it as Healthy.
-- `getMonitoredServiceById`  Given a Monitored Service Id it will return the associated Monitored Service.
+- `getMonitoredServiceById` Given a Monitored Service Id it will return the associated Monitored Service.
 - `getAlertByMonitoredServiceId` Given a Monitored Service Id it will return an Alert Related to that Monitored Service.
 - `markAlertAsAcknowledged` Given an Alert Id it will set the `isAcknowledged` attribute to true for the corresponding Alert entity.
+- `incrementLastLevelContactedForAlert` Given an Alert Id it will increment by 1 the last contacted level of an Escalation Policy. This will alter the lastTargetsLevelNotified field. If there are no further levels to be contacted it will mark the `areLastLevelTargetsNotified` flag as true as well.
 
 Using a relational database we could create several tables, one per model, and some of them may need to have foreign keys to make relations with Monitored Services (for instance, an Alert or an AcknowledgementTimeout are related to Monitored Services 1:1).
 
