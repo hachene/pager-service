@@ -61,7 +61,7 @@ then the Pager doesn't notify any Target
 and doesn't set an acknowledgement delay.
 ```
 
-(*) For the sake of preventing the violation of the SRP, the action of receiving an Acknowledgement is not modeled in this use case but considered part of the previous conditions when triggering the execution of this use case.
+(*) For the sake of preventing the violation of the SRP, the action of receiving an Acknowledgement is not modeled in this use case but considered part of the previous conditions when triggering the execution of this Use Case. This vertical is implemented in `AcknowledgeAlert`.
 
 **Scenario 5**
 ```
@@ -75,9 +75,16 @@ and doesn’t set an acknowledgement delay
 
 (\*\*) For the sake of preventing the violation of the SRP, the action of receiving a Healthy Event is not modeled in this use case but implemented in the `ReceiveHealthyEvent` Use Case.
 
+### ▶️ `AcknowledgeAlert`
+
+As mentioned above, this vertical simply takes care of receiving an Acknowledgement related to an Alert and mark it as acknowledged.
+
+
 ### ▶️ `ReceiveHealthyEvent`
 
-As mentioned above, this vertical simply takes care of receiving a Healthy Event and sets the associated Monitored Service in a Healthy State.
+Similar to the previous one, this Use Case is in charge of receiving a Healthy Event and set the associated Monitored Service in a Healthy State.
+
+
 
 ## 🏗️ Project Architecture
 
@@ -112,6 +119,7 @@ For persistence, the `PersistanceInterface` has been built to enforce the implem
 - `markMonitoredServiceAsHealthy` Given a Monitored Service Id it will mark it as Healthy.
 - `getMonitoredServiceById`  Given a Monitored Service Id it will return the associated Monitored Service.
 - `getAlertByMonitoredServiceId` Given a Monitored Service Id it will return an Alert Related to that Monitored Service.
+- `markAlertAsAcknowledged` Given an Alert Id it will set the `isAcknowledged` attribute to true for the corresponding Alert entity.
 
 Using a relational database we could create several tables, one per model, and some of them may need to have foreign keys to make relations with Monitored Services (for instance, an Alert or an AcknowledgementTimeout are related to Monitored Services 1:1).
 
@@ -122,7 +130,6 @@ The database is also used to guarantee the pager-service does not send an Alert 
 This is an uncompleted project, the written code is a demonstration of how a pager-service could be implemented so there are multiple things to keep working on. Here are some interesting points to take into account:
 
 - As explained in the previous section, when an Alert is sent to a Target, we need to persist it in the database to prevent the same Target to be alerted twice. This and other model persisting actions have not been implemented for the sake of simplicity.
-- The way the Escalation Levels are retrieved is quite fragile since it relies on the fact that there is an array with only two elements, being the position `0` the first level and `1` the last one.
 - Since the adapters are not implemented, some of the tests needed too much mocking, making some of them a bit coupled to the implementation since, the tester, needs to know too much about the implementation of the UseCases. Here, some external modules could be created to test the proper integration with the adapters.
 - The Use Cases should be implementing an interface, as well, to expose an incoming Port where their execution can be triggered without coupling it to a specific implementation.
 
